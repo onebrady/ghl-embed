@@ -30,4 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "s
+  "exclude": ["node_modules", "src/types/generated"]
+}
