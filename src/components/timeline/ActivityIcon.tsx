@@ -2,6 +2,7 @@
 
 import {
   Mail,
+  MailPlus,
   MessageSquare,
   Phone,
   StickyNote,
@@ -23,6 +24,7 @@ const iconConfig: Record<
   task: { icon: CheckSquare, className: "text-purple-600", bg: "bg-purple-100" },
   appointment: { icon: Calendar, className: "text-teal-600", bg: "bg-teal-100" },
   opportunity: { icon: DollarSign, className: "text-emerald-600", bg: "bg-emerald-100" },
+  deal_email: { icon: MailPlus, className: "text-indigo-600", bg: "bg-indigo-100" },
 };
 
 interface ActivityIconProps {
@@ -55,6 +57,7 @@ export function getTypeLabel(type: TimelineItemType): string {
     task: "Task",
     appointment: "Meeting",
     opportunity: "Opportunity",
+    deal_email: "Deal Email",
   };
   return labels[type];
 }
@@ -68,6 +71,7 @@ export function getTypeBorderColor(type: TimelineItemType): string {
     task: "border-l-purple-500",
     appointment: "border-l-teal-500",
     opportunity: "border-l-emerald-500",
+    deal_email: "border-l-indigo-500",
   };
   return colors[type];
 }

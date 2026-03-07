@@ -27,7 +27,7 @@ export function TimelineComposer({ contactId, onMutate }: TimelineComposerProps)
   );
 }
 
-function AddNotePopover({
+export function AddNotePopover({
   contactId,
   onMutate,
 }: {
@@ -100,7 +100,7 @@ function AddNotePopover({
   );
 }
 
-function CreateTaskPopover({
+export function CreateTaskPopover({
   contactId,
   onMutate,
 }: {

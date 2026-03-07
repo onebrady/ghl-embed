@@ -5,7 +5,8 @@ export type TimelineItemType =
   | "note"
   | "task"
   | "appointment"
-  | "opportunity";
+  | "opportunity"
+  | "deal_email";
 
 export type TimelineFilterValue = "all" | TimelineItemType;
 

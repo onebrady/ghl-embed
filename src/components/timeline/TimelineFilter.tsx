@@ -12,6 +12,7 @@ interface TimelineFilterProps {
 const filters: { value: TimelineFilterValue; label: string }[] = [
   { value: "all", label: "All" },
   { value: "email", label: "Emails" },
+  { value: "deal_email", label: "Deal Emails" },
   { value: "sms", label: "SMS" },
   { value: "call", label: "Calls" },
   { value: "note", label: "Notes" },

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ActivityIcon, getTypeLabel, getTypeBorderColor } from "./ActivityIcon";
 import type { TimelineItem as TimelineItemData } from "@/types/timeline";
 import type { GHLNote, GHLTask, GHLAppointment, GHLOpportunity, GHLMessage } from "@/lib/ghl/types";
+import type { DealEmail } from "@/lib/supabase/deal-emails";
 
 interface TimelineItemProps {
   item: TimelineItemData;
@@ -119,6 +120,8 @@ function ExpandedDetail({ item, fullDate }: { item: TimelineItemData; fullDate: 
 
       {item.type === "email" || item.type === "sms" || item.type === "call" ? (
         <MessageDetail message={item.raw as GHLMessage} />
+      ) : item.type === "deal_email" ? (
+        <DealEmailDetail email={item.raw as DealEmail} />
       ) : item.type === "note" ? (
         <NoteDetail note={item.raw as GHLNote} />
       ) : item.type === "task" ? (
@@ -226,6 +229,44 @@ function OpportunityDetail({ opportunity }: { opportunity: GHLOpportunity }) {
           </span>
         )}
       </div>
+    </div>
+  );
+}
+
+function DealEmailDetail({ email }: { email: DealEmail }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+        <span>
+          From: {email.from_name ? `${email.from_name} <${email.from_email}>` : email.from_email}
+        </span>
+        <span>
+          To: {email.to_emails.map((r) => r.name || r.email).join(", ")}
+        </span>
+        {email.cc_emails.length > 0 && (
+          <span>
+            CC: {email.cc_emails.map((r) => r.name || r.email).join(", ")}
+          </span>
+        )}
+      </div>
+      {email.subject && (
+        <p className="text-sm font-medium">{email.subject}</p>
+      )}
+      {email.body_html ? (
+        <div
+          className="prose prose-sm max-h-96 max-w-none overflow-y-auto rounded border bg-background p-3 text-xs"
+          dangerouslySetInnerHTML={{ __html: email.body_html }}
+        />
+      ) : (
+        <p className="whitespace-pre-wrap text-sm">
+          {email.body_text || "(No content)"}
+        </p>
+      )}
+      {email.attachments.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          {email.attachments.length} attachment(s)
+        </p>
+      )}
     </div>
   );
 }

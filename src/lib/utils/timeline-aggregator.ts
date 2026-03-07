@@ -5,6 +5,7 @@ import type {
   GHLAppointment,
   GHLOpportunity,
 } from "@/lib/ghl/types";
+import type { DealEmail } from "@/lib/supabase/deal-emails";
 import type { TimelineItem, TimelineItemType, TimelineFilterValue } from "@/types/timeline";
 
 function truncate(text: string, maxLength = 120): string {
@@ -55,6 +56,7 @@ function getMessageTitle(type: TimelineItemType, direction: "inbound" | "outboun
     task: "Task",
     appointment: "Appointment",
     opportunity: "Opportunity",
+    deal_email: "Deal Email",
   };
   const dirLabel = direction === "inbound" ? "Received" : "Sent";
   return `${labels[type]} ${dirLabel}`;
@@ -177,6 +179,32 @@ function normalizeOpportunities(opportunities: GHLOpportunity[]): TimelineItem[]
   }));
 }
 
+// ─── Deal Email Normalizer ───
+
+export function normalizeDealEmails(emails: DealEmail[]): TimelineItem[] {
+  return emails.map((email) => ({
+    id: email.id,
+    type: "deal_email" as const,
+    timestamp: email.sent_at || email.received_at || email.created_at,
+    title:
+      email.direction === "inbound"
+        ? `Deal Email from ${email.from_name || email.from_email}`
+        : `Deal Email to ${email.to_emails.map((r) => r.name || r.email).join(", ")}`,
+    preview: email.subject || "(No subject)",
+    direction: email.direction,
+    status: email.status,
+    metadata: {
+      threadId: email.thread_id,
+      messageId: email.message_id,
+      fromEmail: email.from_email,
+      toEmails: email.to_emails,
+      ccEmails: email.cc_emails,
+      source: "postmark",
+    },
+    raw: email,
+  }));
+}
+
 // ─── Aggregation ───
 
 export interface TimelineSources {
@@ -185,6 +213,7 @@ export interface TimelineSources {
   tasks: GHLTask[];
   appointments: GHLAppointment[];
   opportunities: GHLOpportunity[];
+  dealEmails?: DealEmail[];
 }
 
 export function aggregateTimeline(sources: TimelineSources): TimelineItem[] {
@@ -194,6 +223,7 @@ export function aggregateTimeline(sources: TimelineSources): TimelineItem[] {
     ...normalizeTasks(sources.tasks),
     ...normalizeAppointments(sources.appointments),
     ...normalizeOpportunities(sources.opportunities),
+    ...(sources.dealEmails ? normalizeDealEmails(sources.dealEmails) : []),
   ];
 
   return all.sort(
