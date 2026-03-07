@@ -73,6 +73,7 @@ interface GHLRequestOptions {
   params?: Record<string, string | number | boolean | undefined>;
   locationId?: string; // Override default location
   maxRetries?: number;
+  apiVersion?: string; // Override the default Version header (e.g., '2021-04-15' for conversations)
 }
 
 interface GHLResponse<T> {
@@ -107,6 +108,7 @@ export async function ghlRequest<T = unknown>(
     params,
     locationId = process.env.GHL_DEFAULT_LOCATION_ID!,
     maxRetries = 3,
+    apiVersion = GHL_API_VERSION,
   } = options;
 
   const token = process.env.GHL_PRIVATE_INTEGRATION_TOKEN;
@@ -141,7 +143,7 @@ export async function ghlRequest<T = unknown>(
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
-          'Version': GHL_API_VERSION,
+          'Version': apiVersion,
         },
         ...(body ? { body: JSON.stringify(body) } : {}),
       });
@@ -201,15 +203,15 @@ export async function ghlRequest<T = unknown>(
 // ─── Convenience Methods ───
 
 export const ghl = {
-  get: <T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>, locationId?: string) =>
-    ghlRequest<T>(endpoint, { method: 'GET', params, locationId }),
+  get: <T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>, locationId?: string, apiVersion?: string) =>
+    ghlRequest<T>(endpoint, { method: 'GET', params, locationId, apiVersion }),
 
-  post: <T>(endpoint: string, body: Record<string, unknown>, locationId?: string) =>
-    ghlRequest<T>(endpoint, { method: 'POST', body, locationId }),
+  post: <T>(endpoint: string, body: Record<string, unknown>, locationId?: string, apiVersion?: string) =>
+    ghlRequest<T>(endpoint, { method: 'POST', body, locationId, apiVersion }),
 
-  put: <T>(endpoint: string, body: Record<string, unknown>, locationId?: string) =>
-    ghlRequest<T>(endpoint, { method: 'PUT', body, locationId }),
+  put: <T>(endpoint: string, body: Record<string, unknown>, locationId?: string, apiVersion?: string) =>
+    ghlRequest<T>(endpoint, { method: 'PUT', body, locationId, apiVersion }),
 
-  delete: <T>(endpoint: string, locationId?: string) =>
-    ghlRequest<T>(endpoint, { method: 'DELETE', locationId }),
+  delete: <T>(endpoint: string, locationId?: string, apiVersion?: string) =>
+    ghlRequest<T>(endpoint, { method: 'DELETE', locationId, apiVersion }),
 };

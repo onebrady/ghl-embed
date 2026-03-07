@@ -2,6 +2,7 @@
 
 import { useContact } from "@/hooks/useContact";
 import { ContactDetailsPanel } from "./ContactDetailsPanel";
+import { ContactTimeline } from "@/components/timeline/ContactTimeline";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ContactRecordViewProps {
@@ -30,11 +31,9 @@ export function ContactRecordView({ contactId }: ContactRecordViewProps) {
         )}
       </div>
 
-      {/* Center Column — Activity Timeline (Phase 2) */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-          Activity timeline coming in Phase 2
-        </div>
+      {/* Center Column — Activity Timeline */}
+      <div className="flex-1 overflow-hidden">
+        <ContactTimeline contactId={contactId} />
       </div>
 
       {/* Right Column — Associations (Phase 3) */}

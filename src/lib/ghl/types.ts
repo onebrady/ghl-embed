@@ -139,3 +139,151 @@ export interface GHLLocationResponse {
 export interface GHLLocationsSearchResponse {
   locations: GHLLocation[];
 }
+
+// ─── Conversation ───
+
+export interface GHLConversation {
+  id: string;
+  contactId: string;
+  locationId: string;
+  lastMessageBody?: string;
+  lastMessageType?: string;
+  lastMessageDate?: string;
+  type?: string;
+  unreadCount?: number;
+  fullName?: string;
+  contactName?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface GHLConversationsSearchResponse {
+  conversations: GHLConversation[];
+  total: number;
+}
+
+// ─── Message ───
+
+export interface GHLMessage {
+  id: string;
+  type?: number;
+  messageType: string;
+  locationId: string;
+  contactId: string;
+  conversationId: string;
+  dateAdded: string;
+  body?: string;
+  direction: 'inbound' | 'outbound';
+  status?: string;
+  contentType?: string;
+  attachments?: string[];
+  source?: string;
+  userId?: string;
+  meta?: Record<string, unknown>;
+}
+
+export interface GHLMessagesResponse {
+  messages: {
+    lastMessageId: string;
+    nextPage: boolean;
+    messages: GHLMessage[];
+  };
+}
+
+// ─── Note ───
+
+export interface GHLNote {
+  id: string;
+  body: string;
+  userId?: string;
+  dateAdded?: string;
+  contactId?: string;
+}
+
+export interface GHLNotesListResponse {
+  notes: GHLNote[];
+}
+
+export interface GHLCreateNoteBody {
+  body: string;
+  userId?: string;
+}
+
+export interface GHLCreateNoteResponse {
+  note: GHLNote;
+}
+
+// ─── Task ───
+
+export interface GHLTask {
+  id: string;
+  title: string;
+  body?: string;
+  assignedTo?: string;
+  dueDate?: string;
+  completed?: boolean;
+  contactId?: string;
+}
+
+export interface GHLTasksListResponse {
+  tasks: GHLTask[];
+}
+
+export interface GHLCreateTaskBody {
+  title: string;
+  body?: string;
+  dueDate: string;
+  completed: boolean;
+  assignedTo?: string;
+}
+
+export interface GHLCreateTaskResponse {
+  task: GHLTask;
+}
+
+// ─── Appointment ───
+
+export interface GHLAppointment {
+  id: string;
+  calendarId?: string;
+  status?: string;
+  title?: string;
+  assignedUserId?: string;
+  notes?: string;
+  startTime?: string;
+  endTime?: string;
+  address?: string;
+  locationId?: string;
+  contactId?: string;
+  appointmentStatus?: string;
+  dateAdded?: string;
+  dateUpdated?: string;
+}
+
+export interface GHLAppointmentsResponse {
+  events: GHLAppointment[];
+}
+
+// ─── Opportunity ───
+
+export interface GHLOpportunity {
+  id: string;
+  name: string;
+  monetaryValue?: number;
+  pipelineId?: string;
+  pipelineStageId?: string;
+  assignedTo?: string;
+  status: string;
+  source?: string;
+  lastStatusChangeAt?: string;
+  lastStageChangeAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  contactId?: string;
+  locationId?: string;
+}
+
+export interface GHLOpportunitiesSearchResponse {
+  opportunities: GHLOpportunity[];
+  meta?: { total?: number; currentPage?: number; nextPage?: number };
+}
