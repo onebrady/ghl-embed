@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "gohighlevel": {
+      "type": "url",
+      "url": "https://services.leadconnectorhq.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer <YOUR_PRIVATE_INTEGRATION_TOKEN>",
+        "x-location-id": "<YOUR_LOCATION_ID>"
+      }
+    }
+  }
+}
