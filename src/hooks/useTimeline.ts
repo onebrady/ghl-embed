@@ -60,22 +60,22 @@ async function timelineFetcher([, contactId, locationId]: [
   );
 
   return {
-    messages: messageArrays.flat() as TimelineSources["messages"],
+    messages: messageArrays.flat() as unknown as TimelineSources["messages"],
     notes:
       notesRes.status === "fulfilled"
-        ? ((notesRes.value.notes ?? []) as TimelineSources["notes"])
+        ? ((notesRes.value.notes ?? []) as unknown as TimelineSources["notes"])
         : [],
     tasks:
       tasksRes.status === "fulfilled"
-        ? ((tasksRes.value.tasks ?? []) as TimelineSources["tasks"])
+        ? ((tasksRes.value.tasks ?? []) as unknown as TimelineSources["tasks"])
         : [],
     appointments:
       appointmentsRes.status === "fulfilled"
-        ? ((appointmentsRes.value.events ?? []) as TimelineSources["appointments"])
+        ? ((appointmentsRes.value.events ?? []) as unknown as TimelineSources["appointments"])
         : [],
     opportunities:
       opportunitiesRes.status === "fulfilled"
-        ? ((opportunitiesRes.value.opportunities ?? []) as TimelineSources["opportunities"])
+        ? ((opportunitiesRes.value.opportunities ?? []) as unknown as TimelineSources["opportunities"])
         : [],
   };
 }

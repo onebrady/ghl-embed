@@ -264,7 +264,41 @@ export interface GHLAppointmentsResponse {
   events: GHLAppointment[];
 }
 
+// ─── Pipeline & Stage ───
+
+export interface GHLPipelineStage {
+  id: string;
+  name: string;
+  position?: number;
+  showInFunnel?: boolean;
+  showInPieChart?: boolean;
+}
+
+export interface GHLPipeline {
+  id: string;
+  name: string;
+  stages: GHLPipelineStage[];
+  showInFunnel?: boolean;
+  showInPieChart?: boolean;
+  locationId?: string;
+}
+
+export interface GHLPipelinesResponse {
+  pipelines: GHLPipeline[];
+}
+
 // ─── Opportunity ───
+
+export type GHLOpportunityStatus = "open" | "won" | "lost" | "abandoned";
+
+export interface GHLOpportunityContact {
+  id: string;
+  name?: string;
+  companyName?: string;
+  email?: string;
+  phone?: string;
+  tags?: string[];
+}
 
 export interface GHLOpportunity {
   id: string;
@@ -277,13 +311,34 @@ export interface GHLOpportunity {
   source?: string;
   lastStatusChangeAt?: string;
   lastStageChangeAt?: string;
+  lastActionDate?: string;
   createdAt?: string;
   updatedAt?: string;
   contactId?: string;
   locationId?: string;
+  contact?: GHLOpportunityContact;
+  customFields?: GHLCustomFieldValue[];
+}
+
+export interface GHLOpportunityResponse {
+  opportunity: GHLOpportunity;
 }
 
 export interface GHLOpportunitiesSearchResponse {
   opportunities: GHLOpportunity[];
   meta?: { total?: number; currentPage?: number; nextPage?: number };
+}
+
+export interface GHLUpdateOpportunityBody {
+  pipelineId?: string;
+  name?: string;
+  pipelineStageId?: string;
+  status?: string;
+  monetaryValue?: number;
+  assignedTo?: string;
+  customFields?: { id?: string; key?: string; field_value?: string | string[] }[];
+}
+
+export interface GHLUpdateOpportunityResponse {
+  opportunity: GHLOpportunity;
 }

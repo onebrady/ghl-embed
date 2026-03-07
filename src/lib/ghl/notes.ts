@@ -15,7 +15,7 @@ export async function getNotes(contactId: string) {
 export async function createNote(contactId: string, body: GHLCreateNoteBody) {
   const { data } = await ghl.post<GHLCreateNoteResponse>(
     `/contacts/${contactId}/notes`,
-    body as Record<string, unknown>
+    body as unknown as Record<string, unknown>
   );
   return data;
 }

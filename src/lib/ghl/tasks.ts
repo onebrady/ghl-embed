@@ -15,7 +15,7 @@ export async function getTasks(contactId: string) {
 export async function createTask(contactId: string, body: GHLCreateTaskBody) {
   const { data } = await ghl.post<GHLCreateTaskResponse>(
     `/contacts/${contactId}/tasks`,
-    body as Record<string, unknown>
+    body as unknown as Record<string, unknown>
   );
   return data;
 }

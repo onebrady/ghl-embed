@@ -2,6 +2,7 @@
 
 import { useContact } from "@/hooks/useContact";
 import { ContactDetailsPanel } from "./ContactDetailsPanel";
+import { ContactAssociations } from "./ContactAssociations";
 import { ContactTimeline } from "@/components/timeline/ContactTimeline";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -36,11 +37,11 @@ export function ContactRecordView({ contactId }: ContactRecordViewProps) {
         <ContactTimeline contactId={contactId} />
       </div>
 
-      {/* Right Column — Associations (Phase 3) */}
+      {/* Right Column — Associations */}
       <div className="w-[320px] shrink-0 overflow-y-auto border-l">
-        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-          Associations coming in Phase 3
-        </div>
+        {contact ? (
+          <ContactAssociations contact={contact} />
+        ) : null}
       </div>
     </div>
   );

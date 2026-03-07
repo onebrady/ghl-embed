@@ -36,7 +36,7 @@ export async function updateContact(
 ) {
   const { data } = await ghl.put<GHLContactUpdateResponse>(
     `/contacts/${contactId}`,
-    body as Record<string, unknown>
+    body as unknown as Record<string, unknown>
   );
   return data;
 }

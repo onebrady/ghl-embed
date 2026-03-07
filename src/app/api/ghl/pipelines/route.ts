@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchOpportunities } from "@/lib/ghl/opportunities";
+import { getPipelines } from "@/lib/ghl/opportunities";
 import { GHLApiError } from "@/lib/ghl/client";
 
 export async function GET(request: NextRequest) {
@@ -15,20 +15,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await searchOpportunities({
-      locationId,
-      contactId: searchParams.get("contactId") || undefined,
-      pipelineId: searchParams.get("pipelineId") || undefined,
-      pipelineStageId: searchParams.get("pipelineStageId") || undefined,
-      status: searchParams.get("status") || "all",
-      q: searchParams.get("q") || undefined,
-      page: searchParams.get("page")
-        ? Number(searchParams.get("page"))
-        : undefined,
-      limit: searchParams.get("limit")
-        ? Number(searchParams.get("limit"))
-        : 20,
-    });
+    const result = await getPipelines(locationId);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof GHLApiError) {

@@ -36,7 +36,7 @@ function AddNotePopover({
 }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const bodyRef = useRef<HTMLTextAreaElement>(undefined);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   async function handleSave() {
     const body = bodyRef.current?.value?.trim();
@@ -109,9 +109,9 @@ function CreateTaskPopover({
 }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const titleRef = useRef<HTMLInputElement>(undefined);
-  const dueDateRef = useRef<HTMLInputElement>(undefined);
-  const bodyRef = useRef<HTMLTextAreaElement>(undefined);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const dueDateRef = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   async function handleSave() {
     const title = titleRef.current?.value?.trim();
