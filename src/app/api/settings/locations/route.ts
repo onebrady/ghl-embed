@@ -25,6 +25,7 @@ export async function GET() {
       .order("created_at", { ascending: true });
 
     if (error) {
+      console.error("[GET /api/settings/locations] Supabase error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -35,7 +36,8 @@ export async function GET() {
     }));
 
     return NextResponse.json({ locations });
-  } catch {
+  } catch (err) {
+    console.error("[GET /api/settings/locations] Unhandled error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -87,6 +89,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
+      console.error("[POST /api/settings/locations] Supabase error:", error);
       if (error.code === "23505") {
         // Unique violation
         return NextResponse.json(
@@ -108,7 +111,8 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch {
+  } catch (err) {
+    console.error("[POST /api/settings/locations] Unhandled error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
