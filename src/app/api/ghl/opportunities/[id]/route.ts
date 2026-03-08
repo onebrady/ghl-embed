@@ -4,13 +4,17 @@ import { GHLApiError } from "@/lib/ghl/client";
 import type { GHLUpdateOpportunityBody } from "@/lib/ghl/types";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const locationId =
+    request.nextUrl.searchParams.get("locationId") ||
+    process.env.GHL_DEFAULT_LOCATION_ID ||
+    undefined;
 
   try {
-    const result = await getOpportunity(id);
+    const result = await getOpportunity(id, locationId);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof GHLApiError) {
@@ -33,8 +37,15 @@ export async function PUT(
   const { id } = await params;
 
   try {
-    const body = (await request.json()) as GHLUpdateOpportunityBody;
-    const result = await updateOpportunity(id, body);
+    const body = (await request.json()) as GHLUpdateOpportunityBody & { locationId?: string };
+    const { locationId: bodyLocationId, ...updateBody } = body;
+    const locationId =
+      bodyLocationId ||
+      request.nextUrl.searchParams.get("locationId") ||
+      process.env.GHL_DEFAULT_LOCATION_ID ||
+      undefined;
+
+    const result = await updateOpportunity(id, updateBody as GHLUpdateOpportunityBody, locationId);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof GHLApiError) {

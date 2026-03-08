@@ -40,20 +40,24 @@ export async function searchOpportunities(params: SearchOpportunitiesParams) {
 
 // ─── CRUD ───
 
-export async function getOpportunity(opportunityId: string) {
+export async function getOpportunity(opportunityId: string, locationId?: string) {
   const { data } = await ghl.get<GHLOpportunityResponse>(
-    `/opportunities/${opportunityId}`
+    `/opportunities/${opportunityId}`,
+    undefined,
+    locationId
   );
   return data;
 }
 
 export async function updateOpportunity(
   opportunityId: string,
-  body: GHLUpdateOpportunityBody
+  body: GHLUpdateOpportunityBody,
+  locationId?: string
 ) {
   const { data } = await ghl.put<GHLUpdateOpportunityResponse>(
     `/opportunities/${opportunityId}`,
-    body as unknown as Record<string, unknown>
+    body as unknown as Record<string, unknown>,
+    locationId
   );
   return data;
 }

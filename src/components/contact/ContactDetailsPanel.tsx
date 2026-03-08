@@ -5,6 +5,7 @@ import type { KeyedMutator } from "swr";
 import type { GHLContact, GHLContactResponse } from "@/lib/ghl/types";
 import { FieldGroup, type FieldDefinition } from "./FieldGroup";
 import { useCustomFieldDefinitions } from "@/hooks/useCustomFields";
+import { useSubAccount } from "@/hooks/useSubAccount";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -23,6 +24,7 @@ export function ContactDetailsPanel({
   mutate,
 }: ContactDetailsPanelProps) {
   const router = useRouter();
+  const { locationId } = useSubAccount();
   const { fieldMap } = useCustomFieldDefinitions();
 
   const handleSave = useCallback(
@@ -37,7 +39,7 @@ export function ContactDetailsPanel({
       try {
         await mutate(optimisticData, { revalidate: false });
 
-        const res = await fetch(`/api/ghl/contacts/${contact.id}`, {
+        const res = await fetch(`/api/ghl/contacts/${contact.id}?locationId=${locationId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ [fieldKey]: newValue || null }),

@@ -14,29 +14,37 @@ export interface ListContactsParams {
 }
 
 export async function listContacts(params: ListContactsParams) {
-  const { data } = await ghl.get<GHLContactsListResponse>("/contacts/", {
-    locationId: params.locationId,
-    query: params.query,
-    limit: params.limit ?? 20,
-    startAfterId: params.startAfterId,
-  });
+  const { data } = await ghl.get<GHLContactsListResponse>(
+    "/contacts/",
+    {
+      locationId: params.locationId,
+      query: params.query,
+      limit: params.limit ?? 20,
+      startAfterId: params.startAfterId,
+    },
+    params.locationId
+  );
   return data;
 }
 
-export async function getContact(contactId: string) {
+export async function getContact(contactId: string, locationId?: string) {
   const { data } = await ghl.get<GHLContactResponse>(
-    `/contacts/${contactId}`
+    `/contacts/${contactId}`,
+    undefined,
+    locationId
   );
   return data;
 }
 
 export async function updateContact(
   contactId: string,
-  body: GHLUpdateContactBody
+  body: GHLUpdateContactBody,
+  locationId?: string
 ) {
   const { data } = await ghl.put<GHLContactUpdateResponse>(
     `/contacts/${contactId}`,
-    body as unknown as Record<string, unknown>
+    body as unknown as Record<string, unknown>,
+    locationId
   );
   return data;
 }

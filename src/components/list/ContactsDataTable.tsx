@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { preload } from "swr";
 import { useContacts } from "@/hooks/useContacts";
+import { useSubAccount } from "@/hooks/useSubAccount";
 import { ContactsFilterBar } from "./ContactsFilterBar";
 import {
   Table,
@@ -37,6 +38,7 @@ function formatDate(iso?: string): string {
 export function ContactsDataTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const { locationId } = useSubAccount();
   const { contacts, count, isLoading, error } = useContacts({
     query: searchQuery || undefined,
     limit: 50,
@@ -53,7 +55,7 @@ export function ContactsDataTable() {
 
   const handleRowHover = useCallback(
     (contactId: string) => {
-      preload(`/api/ghl/contacts/${contactId}`, fetcher);
+      preload(`/api/ghl/contacts/${contactId}?locationId=${locationId}`, fetcher);
     },
     [fetcher]
   );

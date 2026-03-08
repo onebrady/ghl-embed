@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import { useSubAccount } from "./useSubAccount";
 import type { GHLOpportunityResponse } from "@/lib/ghl/types";
 
 const fetcher = (url: string) =>
@@ -10,8 +11,10 @@ const fetcher = (url: string) =>
   });
 
 export function useOpportunity(opportunityId: string | null) {
+  const { locationId } = useSubAccount();
+
   const { data, error, isLoading, mutate } = useSWR<GHLOpportunityResponse>(
-    opportunityId ? `/api/ghl/opportunities/${opportunityId}` : null,
+    opportunityId ? `/api/ghl/opportunities/${opportunityId}?locationId=${locationId}` : null,
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 }
   );

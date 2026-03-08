@@ -8,6 +8,7 @@ import {
   type FieldDefinition,
 } from "@/components/contact/FieldGroup";
 import { usePipelines } from "@/hooks/usePipelines";
+import { useSubAccount } from "@/hooks/useSubAccount";
 import { OpportunityStatusBadge } from "./OpportunityStatusBadge";
 import { StageProgressBar } from "./StageProgressBar";
 import { Separator } from "@/components/ui/separator";
@@ -26,6 +27,7 @@ export function DealDetailsPanel({
   mutate,
 }: DealDetailsPanelProps) {
   const router = useRouter();
+  const { locationId } = useSubAccount();
   const { getPipeline, getPipelineName, getStageName } = usePipelines();
 
   const handleSave = useCallback(
@@ -53,7 +55,7 @@ export function DealDetailsPanel({
       try {
         await mutate(optimisticData, { revalidate: false });
 
-        const res = await fetch(`/api/ghl/opportunities/${opportunity.id}`, {
+        const res = await fetch(`/api/ghl/opportunities/${opportunity.id}?locationId=${locationId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),

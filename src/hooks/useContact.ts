@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import { useSubAccount } from "./useSubAccount";
 import type { GHLContactResponse } from "@/lib/ghl/types";
 
 const fetcher = (url: string) =>
@@ -10,8 +11,10 @@ const fetcher = (url: string) =>
   });
 
 export function useContact(contactId: string | null) {
+  const { locationId } = useSubAccount();
+
   const { data, error, isLoading, mutate } = useSWR<GHLContactResponse>(
-    contactId ? `/api/ghl/contacts/${contactId}` : null,
+    contactId ? `/api/ghl/contacts/${contactId}?locationId=${locationId}` : null,
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 }
   );

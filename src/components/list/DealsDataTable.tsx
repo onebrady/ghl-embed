@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { preload } from "swr";
 import { useOpportunities } from "@/hooks/useOpportunities";
+import { useSubAccount } from "@/hooks/useSubAccount";
 import { usePipelines } from "@/hooks/usePipelines";
 import { DealsFilterBar } from "./DealsFilterBar";
 import { OpportunityStatusBadge } from "@/components/deal/OpportunityStatusBadge";
@@ -47,6 +48,7 @@ export function DealsDataTable() {
     limit: 50,
   });
 
+  const { locationId } = useSubAccount();
   const { getPipelineName, getStageName } = usePipelines();
 
   const fetcher = useCallback(
@@ -60,7 +62,7 @@ export function DealsDataTable() {
 
   const handleRowHover = useCallback(
     (oppId: string) => {
-      preload(`/api/ghl/opportunities/${oppId}`, fetcher);
+      preload(`/api/ghl/opportunities/${oppId}?locationId=${locationId}`, fetcher);
     },
     [fetcher]
   );

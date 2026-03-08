@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { StickyNote, CheckSquare, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useSubAccount } from "@/hooks/useSubAccount";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,7 @@ export function AddNotePopover({
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const { locationId } = useSubAccount();
 
   async function handleSave() {
     const body = bodyRef.current?.value?.trim();
@@ -47,7 +49,7 @@ export function AddNotePopover({
       const res = await fetch("/api/ghl/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contactId, body }),
+        body: JSON.stringify({ contactId, body, locationId }),
       });
 
       if (!res.ok) {
@@ -112,6 +114,7 @@ export function CreateTaskPopover({
   const titleRef = useRef<HTMLInputElement>(null);
   const dueDateRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const { locationId } = useSubAccount();
 
   async function handleSave() {
     const title = titleRef.current?.value?.trim();
@@ -133,6 +136,7 @@ export function CreateTaskPopover({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contactId,
+          locationId,
           title,
           dueDate: new Date(dueDate).toISOString(),
           body: bodyRef.current?.value?.trim() || undefined,

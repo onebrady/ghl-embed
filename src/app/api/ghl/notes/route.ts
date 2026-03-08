@@ -3,7 +3,12 @@ import { getNotes, createNote } from "@/lib/ghl/notes";
 import { GHLApiError } from "@/lib/ghl/client";
 
 export async function GET(request: NextRequest) {
-  const contactId = request.nextUrl.searchParams.get("contactId");
+  const searchParams = request.nextUrl.searchParams;
+  const contactId = searchParams.get("contactId");
+  const locationId =
+    searchParams.get("locationId") ||
+    process.env.GHL_DEFAULT_LOCATION_ID ||
+    undefined;
 
   if (!contactId) {
     return NextResponse.json(
@@ -13,7 +18,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await getNotes(contactId);
+    const result = await getNotes(contactId, locationId);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof GHLApiError) {
@@ -32,7 +37,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { contactId, ...noteBody } = body;
+    const { contactId, locationId: bodyLocationId, ...noteBody } = body;
 
     if (!contactId) {
       return NextResponse.json(
@@ -48,7 +53,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await createNote(contactId, noteBody);
+    const locationId =
+      bodyLocationId ||
+      process.env.GHL_DEFAULT_LOCATION_ID ||
+      undefined;
+
+    const result = await createNote(contactId, noteBody, locationId);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof GHLApiError) {

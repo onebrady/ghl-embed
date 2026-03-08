@@ -8,10 +8,15 @@ export async function GET(
 ) {
   const { id } = await params;
   const searchParams = request.nextUrl.searchParams;
+  const locationId =
+    searchParams.get("locationId") ||
+    process.env.GHL_DEFAULT_LOCATION_ID ||
+    undefined;
 
   try {
     const result = await getMessages({
       conversationId: id,
+      locationId,
       limit: searchParams.get("limit")
         ? Number(searchParams.get("limit"))
         : 50,

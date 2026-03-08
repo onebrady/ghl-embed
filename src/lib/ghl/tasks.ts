@@ -5,17 +5,20 @@ import type {
   GHLCreateTaskResponse,
 } from "./types";
 
-export async function getTasks(contactId: string) {
+export async function getTasks(contactId: string, locationId?: string) {
   const { data } = await ghl.get<GHLTasksListResponse>(
-    `/contacts/${contactId}/tasks`
+    `/contacts/${contactId}/tasks`,
+    undefined,
+    locationId
   );
   return data;
 }
 
-export async function createTask(contactId: string, body: GHLCreateTaskBody) {
+export async function createTask(contactId: string, body: GHLCreateTaskBody, locationId?: string) {
   const { data } = await ghl.post<GHLCreateTaskResponse>(
     `/contacts/${contactId}/tasks`,
-    body as unknown as Record<string, unknown>
+    body as unknown as Record<string, unknown>,
+    locationId
   );
   return data;
 }

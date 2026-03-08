@@ -30,13 +30,13 @@ async function timelineFetcher([, contactId, locationId]: [
         `/api/ghl/conversations?contactId=${contactId}&locationId=${locationId}`
       ),
       fetchJson<{ notes?: Array<Record<string, unknown>> }>(
-        `/api/ghl/notes?contactId=${contactId}`
+        `/api/ghl/notes?contactId=${contactId}&locationId=${locationId}`
       ),
       fetchJson<{ tasks?: Array<Record<string, unknown>> }>(
-        `/api/ghl/tasks?contactId=${contactId}`
+        `/api/ghl/tasks?contactId=${contactId}&locationId=${locationId}`
       ),
       fetchJson<{ events?: Array<Record<string, unknown>> }>(
-        `/api/ghl/calendars?contactId=${contactId}`
+        `/api/ghl/calendars?contactId=${contactId}&locationId=${locationId}`
       ),
       fetchJson<{ opportunities?: Array<Record<string, unknown>> }>(
         `/api/ghl/opportunities?contactId=${contactId}&locationId=${locationId}`
@@ -52,7 +52,7 @@ async function timelineFetcher([, contactId, locationId]: [
   const messageArrays = await Promise.all(
     conversations.slice(0, MAX_CONVERSATIONS_FOR_MESSAGES).map((conv) =>
       fetchJson<{ messages?: { messages?: Array<Record<string, unknown>> } }>(
-        `/api/ghl/conversations/${conv.id}/messages?limit=50`
+        `/api/ghl/conversations/${conv.id}/messages?limit=50&locationId=${locationId}`
       )
         .then((data) => data.messages?.messages ?? [])
         .catch(() => [])

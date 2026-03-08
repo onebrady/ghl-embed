@@ -3,7 +3,12 @@ import { getAppointments } from "@/lib/ghl/calendars";
 import { GHLApiError } from "@/lib/ghl/client";
 
 export async function GET(request: NextRequest) {
-  const contactId = request.nextUrl.searchParams.get("contactId");
+  const searchParams = request.nextUrl.searchParams;
+  const contactId = searchParams.get("contactId");
+  const locationId =
+    searchParams.get("locationId") ||
+    process.env.GHL_DEFAULT_LOCATION_ID ||
+    undefined;
 
   if (!contactId) {
     return NextResponse.json(
@@ -13,7 +18,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await getAppointments(contactId);
+    const result = await getAppointments(contactId, locationId);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof GHLApiError) {
