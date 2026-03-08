@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { preload } from "swr";
 import { useContacts } from "@/hooks/useContacts";
 import { ContactsFilterBar } from "./ContactsFilterBar";
 import {
@@ -40,6 +41,22 @@ export function ContactsDataTable() {
     query: searchQuery || undefined,
     limit: 50,
   });
+
+  const fetcher = useCallback(
+    (url: string) =>
+      fetch(url).then((res) => {
+        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+        return res.json();
+      }),
+    []
+  );
+
+  const handleRowHover = useCallback(
+    (contactId: string) => {
+      preload(`/api/ghl/contacts/${contactId}`, fetcher);
+    },
+    [fetcher]
+  );
 
   return (
     <div className="space-y-4">
@@ -89,6 +106,7 @@ export function ContactsDataTable() {
                   key={contact.id}
                   className="cursor-pointer"
                   onClick={() => router.push(`/contacts/${contact.id}`)}
+                  onMouseEnter={() => handleRowHover(contact.id)}
                 >
                   <TableCell className="font-medium">
                     {getDisplayName(contact)}

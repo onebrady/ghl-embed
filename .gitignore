@@ -26,3 +26,9 @@ Thumbs.db
 
 # mcp config (contains tokens)
 .mcp.json
+
+# supabase temp
+supabase/.temp/
+
+# typescript build info
+tsconfig.tsbuildinfo

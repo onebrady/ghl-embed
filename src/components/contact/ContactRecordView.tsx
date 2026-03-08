@@ -4,6 +4,7 @@ import { useContact } from "@/hooks/useContact";
 import { ContactDetailsPanel } from "./ContactDetailsPanel";
 import { ContactAssociations } from "./ContactAssociations";
 import { ContactTimeline } from "@/components/timeline/ContactTimeline";
+import { ErrorFallback } from "@/components/ErrorFallback";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ContactRecordViewProps {
@@ -11,34 +12,36 @@ interface ContactRecordViewProps {
 }
 
 export function ContactRecordView({ contactId }: ContactRecordViewProps) {
-  const { contact, isLoading, error } = useContact(contactId);
+  const { contact, isLoading, error, mutate } = useContact(contactId);
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-destructive">Failed to load contact.</p>
-      </div>
+      <ErrorFallback
+        error={error}
+        reset={() => mutate()}
+        title="Failed to load contact"
+      />
     );
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full flex-col lg:flex-row">
       {/* Left Column — Contact Details */}
-      <div className="w-[380px] shrink-0 overflow-y-auto border-r">
+      <div className="w-full shrink-0 overflow-y-auto border-b lg:w-[380px] lg:border-b-0 lg:border-r">
         {isLoading || !contact ? (
           <ContactDetailsSkeleton />
         ) : (
-          <ContactDetailsPanel contact={contact} />
+          <ContactDetailsPanel contact={contact} mutate={mutate} />
         )}
       </div>
 
       {/* Center Column — Activity Timeline */}
-      <div className="flex-1 overflow-hidden">
+      <div className="min-h-[400px] flex-1 overflow-hidden">
         <ContactTimeline contactId={contactId} />
       </div>
 
       {/* Right Column — Associations */}
-      <div className="w-[320px] shrink-0 overflow-y-auto border-l">
+      <div className="w-full shrink-0 overflow-y-auto border-t lg:w-[320px] lg:border-t-0 lg:border-l">
         {contact ? (
           <ContactAssociations contact={contact} />
         ) : null}

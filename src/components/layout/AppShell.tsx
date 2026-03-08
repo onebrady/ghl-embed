@@ -1,13 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { SubAccountSwitcher } from "./SubAccountSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
+import { Settings } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Preserve locationId in links when embedded via GHL iframe
+  const locationId = searchParams.get("locationId");
+  const qs = locationId ? `?locationId=${locationId}` : "";
 
   return (
     <div className="flex h-screen flex-col">
@@ -18,7 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </span>
           <nav className="ml-6 flex items-center gap-1">
             <Link
-              href="/contacts"
+              href={`/contacts${qs}`}
               className={cn(
                 "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                 pathname.startsWith("/contacts")
@@ -29,7 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               Contacts
             </Link>
             <Link
-              href="/deals"
+              href={`/deals${qs}`}
               className={cn(
                 "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                 pathname.startsWith("/deals")
@@ -41,7 +48,22 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           </nav>
         </div>
-        <SubAccountSwitcher />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/settings"
+            className={cn(
+              "rounded-md p-2 transition-colors",
+              pathname.startsWith("/settings")
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            )}
+            title="Settings"
+          >
+            <Settings className="h-4 w-4" />
+          </Link>
+          <ThemeToggle />
+          <SubAccountSwitcher />
+        </div>
       </header>
       <main className="flex-1 overflow-hidden">{children}</main>
     </div>

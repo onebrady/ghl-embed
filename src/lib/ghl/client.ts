@@ -1,12 +1,17 @@
 /**
  * GoHighLevel API v2 Client
- * 
+ *
  * Centralized HTTP client for all GHL API interactions.
  * Handles authentication, rate limiting, retries, and error normalization.
- * 
+ *
  * ALL GHL API calls in the app MUST go through this client.
  * Never import fetch directly for GHL endpoints.
+ *
+ * Token resolution: Looks up Private Integration Token per locationId
+ * from the Supabase ghl_locations table, with env var fallback.
  */
+
+import { resolveToken } from './token-resolver';
 
 const GHL_BASE_URL = process.env.GHL_API_BASE_URL || 'https://services.leadconnectorhq.com';
 const GHL_API_VERSION = '2021-07-28';
@@ -111,10 +116,7 @@ export async function ghlRequest<T = unknown>(
     apiVersion = GHL_API_VERSION,
   } = options;
 
-  const token = process.env.GHL_PRIVATE_INTEGRATION_TOKEN;
-  if (!token) {
-    throw new Error('GHL_PRIVATE_INTEGRATION_TOKEN is not set');
-  }
+  const token = await resolveToken(locationId);
 
   // Build URL with query params
   const url = new URL(endpoint, GHL_BASE_URL);

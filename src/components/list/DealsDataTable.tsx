@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { preload } from "swr";
 import { useOpportunities } from "@/hooks/useOpportunities";
 import { usePipelines } from "@/hooks/usePipelines";
 import { DealsFilterBar } from "./DealsFilterBar";
@@ -47,6 +48,22 @@ export function DealsDataTable() {
   });
 
   const { getPipelineName, getStageName } = usePipelines();
+
+  const fetcher = useCallback(
+    (url: string) =>
+      fetch(url).then((res) => {
+        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+        return res.json();
+      }),
+    []
+  );
+
+  const handleRowHover = useCallback(
+    (oppId: string) => {
+      preload(`/api/ghl/opportunities/${oppId}`, fetcher);
+    },
+    [fetcher]
+  );
 
   return (
     <div className="space-y-4">
@@ -107,6 +124,7 @@ export function DealsDataTable() {
                   key={opp.id}
                   className="cursor-pointer"
                   onClick={() => router.push(`/deals/${opp.id}`)}
+                  onMouseEnter={() => handleRowHover(opp.id)}
                 >
                   <TableCell className="font-medium">{opp.name}</TableCell>
                   <TableCell className="text-muted-foreground">

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { SubAccountProvider } from "@/hooks/useSubAccount";
 import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
@@ -28,14 +30,18 @@ export default function RootLayout({
   const defaultLocationId = process.env.GHL_DEFAULT_LOCATION_ID || "";
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SubAccountProvider defaultLocationId={defaultLocationId}>
-          <AppShell>{children}</AppShell>
-        </SubAccountProvider>
-        <Toaster />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Suspense>
+            <SubAccountProvider defaultLocationId={defaultLocationId}>
+              <AppShell>{children}</AppShell>
+            </SubAccountProvider>
+          </Suspense>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

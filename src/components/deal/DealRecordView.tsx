@@ -4,6 +4,7 @@ import { useOpportunity } from "@/hooks/useOpportunity";
 import { DealDetailsPanel } from "./DealDetailsPanel";
 import { DealTimeline } from "./DealTimeline";
 import { DealAssociations } from "./DealAssociations";
+import { ErrorFallback } from "@/components/ErrorFallback";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface DealRecordViewProps {
@@ -11,29 +12,32 @@ interface DealRecordViewProps {
 }
 
 export function DealRecordView({ opportunityId }: DealRecordViewProps) {
-  const { opportunity, isLoading, error } = useOpportunity(opportunityId);
+  const { opportunity, isLoading, error, mutate } =
+    useOpportunity(opportunityId);
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-destructive">Failed to load deal.</p>
-      </div>
+      <ErrorFallback
+        error={error}
+        reset={() => mutate()}
+        title="Failed to load deal"
+      />
     );
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full flex-col lg:flex-row">
       {/* Left Column — Deal Details */}
-      <div className="w-[380px] shrink-0 overflow-y-auto border-r">
+      <div className="w-full shrink-0 overflow-y-auto border-b lg:w-[380px] lg:border-b-0 lg:border-r">
         {isLoading || !opportunity ? (
           <DealDetailsSkeleton />
         ) : (
-          <DealDetailsPanel opportunity={opportunity} />
+          <DealDetailsPanel opportunity={opportunity} mutate={mutate} />
         )}
       </div>
 
       {/* Center Column — Activity Timeline */}
-      <div className="flex-1 overflow-hidden">
+      <div className="min-h-[400px] flex-1 overflow-hidden">
         {opportunity ? (
           <DealTimeline opportunity={opportunity} />
         ) : (
@@ -44,7 +48,7 @@ export function DealRecordView({ opportunityId }: DealRecordViewProps) {
       </div>
 
       {/* Right Column — Associations */}
-      <div className="w-[320px] shrink-0 overflow-y-auto border-l">
+      <div className="w-full shrink-0 overflow-y-auto border-t lg:w-[320px] lg:border-t-0 lg:border-l">
         {opportunity ? (
           <DealAssociations opportunity={opportunity} />
         ) : null}

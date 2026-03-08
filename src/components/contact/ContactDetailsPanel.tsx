@@ -1,6 +1,8 @@
 "use client";
 
-import type { GHLContact } from "@/lib/ghl/types";
+import { useCallback } from "react";
+import type { KeyedMutator } from "swr";
+import type { GHLContact, GHLContactResponse } from "@/lib/ghl/types";
 import { FieldGroup, type FieldDefinition } from "./FieldGroup";
 import { useCustomFieldDefinitions } from "@/hooks/useCustomFields";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -9,14 +11,57 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface ContactDetailsPanelProps {
   contact: GHLContact;
+  mutate?: KeyedMutator<GHLContactResponse>;
 }
 
-export function ContactDetailsPanel({ contact }: ContactDetailsPanelProps) {
+export function ContactDetailsPanel({
+  contact,
+  mutate,
+}: ContactDetailsPanelProps) {
   const router = useRouter();
   const { fieldMap } = useCustomFieldDefinitions();
+
+  const handleSave = useCallback(
+    async (fieldKey: string, newValue: string) => {
+      if (!mutate) return;
+
+      // Optimistic update
+      const optimisticData: GHLContactResponse = {
+        contact: { ...contact, [fieldKey]: newValue || undefined },
+      };
+
+      try {
+        await mutate(optimisticData, { revalidate: false });
+
+        const res = await fetch(`/api/ghl/contacts/${contact.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [fieldKey]: newValue || null }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(
+            (err as { error?: string }).error || `Save failed (${res.status})`
+          );
+        }
+
+        await mutate();
+        toast.success("Saved");
+      } catch (err) {
+        await mutate(); // Rollback to server truth
+        toast.error(
+          err instanceof Error ? err.message : "Failed to save changes"
+        );
+        throw err;
+      }
+    },
+    [contact, mutate]
+  );
 
   const initials =
     [contact.firstName?.[0], contact.lastName?.[0]]
@@ -30,24 +75,65 @@ export function ContactDetailsPanel({ contact }: ContactDetailsPanelProps) {
     contact.email ||
     "Unknown Contact";
 
+  const editable = !!mutate;
+
   const contactInfoFields: FieldDefinition[] = [
-    { label: "Email", value: contact.email },
-    { label: "Phone", value: contact.phone },
-    { label: "Address", value: contact.address1 },
-    { label: "City", value: contact.city },
-    { label: "State", value: contact.state },
-    { label: "Postal Code", value: contact.postalCode },
-    { label: "Country", value: contact.country },
-    { label: "Timezone", value: contact.timezone },
+    {
+      label: "Email",
+      value: contact.email,
+      editable,
+      fieldKey: "email",
+      inputType: "email",
+    },
+    {
+      label: "Phone",
+      value: contact.phone,
+      editable,
+      fieldKey: "phone",
+      inputType: "phone",
+    },
+    {
+      label: "Address",
+      value: contact.address1,
+      editable,
+      fieldKey: "address1",
+    },
+    { label: "City", value: contact.city, editable, fieldKey: "city" },
+    { label: "State", value: contact.state, editable, fieldKey: "state" },
+    {
+      label: "Postal Code",
+      value: contact.postalCode,
+      editable,
+      fieldKey: "postalCode",
+    },
+    { label: "Country", value: contact.country, editable, fieldKey: "country" },
+    {
+      label: "Timezone",
+      value: contact.timezone,
+      editable,
+      fieldKey: "timezone",
+    },
   ];
 
   const companyFields: FieldDefinition[] = [
-    { label: "Company", value: contact.companyName },
-    { label: "Website", value: contact.website, type: "link" },
+    {
+      label: "Company",
+      value: contact.companyName,
+      editable,
+      fieldKey: "companyName",
+    },
+    {
+      label: "Website",
+      value: contact.website,
+      type: "link",
+      editable,
+      fieldKey: "website",
+      inputType: "url",
+    },
   ];
 
   const attributionFields: FieldDefinition[] = [
-    { label: "Source", value: contact.source },
+    { label: "Source", value: contact.source, editable, fieldKey: "source" },
   ];
 
   const systemFields: FieldDefinition[] = [
@@ -59,9 +145,7 @@ export function ContactDetailsPanel({ contact }: ContactDetailsPanelProps) {
   ];
 
   // Resolve custom field labels from definitions
-  const customFieldItems: FieldDefinition[] = (
-    contact.customFields ?? []
-  )
+  const customFieldItems: FieldDefinition[] = (contact.customFields ?? [])
     .filter((cf) => cf.value)
     .map((cf) => {
       const def = fieldMap.get(cf.id);
@@ -107,13 +191,21 @@ export function ContactDetailsPanel({ contact }: ContactDetailsPanelProps) {
       {contact.dnd && <Badge variant="destructive">Do Not Disturb</Badge>}
 
       <Separator />
-      <FieldGroup title="Contact Information" fields={contactInfoFields} />
+      <FieldGroup
+        title="Contact Information"
+        fields={contactInfoFields}
+        onSave={handleSave}
+      />
 
       <Separator />
-      <FieldGroup title="Company" fields={companyFields} />
+      <FieldGroup title="Company" fields={companyFields} onSave={handleSave} />
 
       <Separator />
-      <FieldGroup title="Attribution" fields={attributionFields} />
+      <FieldGroup
+        title="Attribution"
+        fields={attributionFields}
+        onSave={handleSave}
+      />
 
       {/* Tags */}
       {contact.tags && contact.tags.length > 0 && (
